@@ -17,7 +17,8 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
     std::uniform_real_distribution<> distProb(0.0, 1.0);
 
     std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    double currentProbRoom = probGenerateRoom; // Probabilidad actual para generar habitación
+    double currentProbRoom = probGenerateRoom;
+    double currentProbChange = probChangeDirection; // Probabilidad actual para cambiar dirección
 
     for (int walk = 0; walk < J; ++walk) {
         int currentDirection = distDirection(gen);
@@ -25,27 +26,30 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
             // Marcar la posición actual como pasillo (1)
             newMap[agentX][agentY] = 1;
 
-            // Decidir si generar una habitación
+            // Generar habitación
             if (distProb(gen) < currentProbRoom) {
-                // Generar habitación centrada en (agentX, agentY)
                 int halfX = roomSizeX / 2;
                 int halfY = roomSizeY / 2;
-                // Ajustar límites para no salirse del mapa
                 int startX = std::max(0, agentX - halfX);
                 int endX = std::min(H - 1, agentX + halfX);
                 int startY = std::max(0, agentY - halfY);
                 int endY = std::min(W - 1, agentY + halfY);
-                // Marcar la habitación con 1
                 for (int x = startX; x <= endX; ++x) {
                     for (int y = startY; y <= endY; ++y) {
                         newMap[x][y] = 1;
                     }
                 }
-                // Reiniciar probabilidad
                 currentProbRoom = probGenerateRoom;
             } else {
-                // Aumentar probabilidad si no se genera habitación
                 currentProbRoom += probIncreaseRoom;
+            }
+
+            // Decidir si cambiar de dirección
+            if (distProb(gen) < currentProbChange) {
+                currentDirection = distDirection(gen);
+                currentProbChange = probChangeDirection; // Reiniciar probabilidad
+            } else {
+                currentProbChange += probIncreaseChange; // Aumentar probabilidad
             }
 
             // Calcular el siguiente movimiento
@@ -60,6 +64,7 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
                 agentY = nextY;
             } else {
                 currentDirection = distDirection(gen);
+                currentProbChange = probChangeDirection; // Reiniciar probabilidad al chocar con el borde
             }
         }
     }
