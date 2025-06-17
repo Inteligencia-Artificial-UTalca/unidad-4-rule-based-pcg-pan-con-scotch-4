@@ -15,14 +15,12 @@ void printMap(const Map& map) {
     std::cout << "--- Current Map ---" << std::endl;
     for (const auto& row : map) {
         for (int cell : row) {
-            // Adapt this to represent your cells meaningfully (e.g., ' ' for empty, '#' for occupied).
-            std::cout << cell << " ";
+            std::cout << (cell == 1 ? "#" : " ") << " ";
         }
         std::cout << std::endl;
     }
     std::cout << "-------------------" << std::endl;
 }
-
 /**
  * @brief Function to implement the Cellular Automata logic.
  * It should take a map and return the updated map after one iteration.
@@ -33,7 +31,8 @@ void printMap(const Map& map) {
  * @param U Threshold to decide if the current cell becomes 1 or 0.
  * @return The map after applying the cellular automata rules.
  */
-Map cellularAutomata(Map& currentMap, int W, int H, int R, double U) {
+Map cellularAutomata(const Map& currentMap, int W, int H, int R, double U) {
+    Map newMap = currentMap; // Copia del mapa actual
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 gen(seed);
     std::uniform_real_distribution<> distProb(0.0, 1.0);
@@ -46,19 +45,18 @@ Map cellularAutomata(Map& currentMap, int W, int H, int R, double U) {
                 for (int dj = -R; dj <= R; ++dj) {
                     int ni = i + di;
                     int nj = j + dj;
-                    // Verificar si el vecino está dentro del mapa
                     if (ni >= 0 && ni < H && nj >= 0 && nj < W) {
                         countOnes += currentMap[ni][nj];
                     }
                 }
             }
-            // Aplicar regla: si el conteo supera el umbral U, la celda se convierte en 1
+            // Aplicar regla
             double neighborRatio = static_cast<double>(countOnes) / ((2 * R + 1) * (2 * R + 1));
-            currentMap[i][j] = (neighborRatio > U) ? 1 : 0;
+            newMap[i][j] = (neighborRatio > U) ? 1 : 0;
         }
     }
 
-    return currentMap;
+    return newMap;
 }
 
 /**
