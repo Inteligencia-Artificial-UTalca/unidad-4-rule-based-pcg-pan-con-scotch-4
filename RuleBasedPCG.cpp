@@ -6,6 +6,64 @@
 // Define Map as a vector of vectors of integers.
 // You can change 'int' to whatever type best represents your cells (e.g., char, bool).
 using Map = std::vector<std::vector<int>>;
+
+/**
+ * @brief Prints the map (matrix) to the console.
+ * @param map The map to print.
+ */
+void printMap(const Map& map) {
+    std::cout << "--- Current Map ---" << std::endl;
+    for (const auto& row : map) {
+        for (int cell : row) {
+            // Adapt this to represent your cells meaningfully (e.g., ' ' for empty, '#' for occupied).
+            std::cout << cell << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "-------------------" << std::endl;
+}
+
+/**
+ * @brief Function to implement the Cellular Automata logic.
+ * It should take a map and return the updated map after one iteration.
+ * @param currentMap The map in its current state.
+ * @param W Width of the map.
+ * @param H Height of the map.
+ * @param R Radius of the neighbor window (e.g., 1 for 3x3, 2 for 5x5).
+ * @param U Threshold to decide if the current cell becomes 1 or 0.
+ * @return The map after applying the cellular automata rules.
+ */
+Map cellularAutomata(const Map& currentMap, int W, int H, int R, double U) {
+    Map newMap = currentMap; // Initially, the new map is a copy of the current one
+
+    // TODO: IMPLEMENTATION GOES HERE for the cellular automata logic.
+    // Iterate over each cell and apply the transition rules.
+    // Remember that updates should be based on the 'currentMap' state
+    // and applied to the 'newMap' to avoid race conditions within the same iteration.
+
+    return newMap;
+}
+
+/**
+ * @brief Function to implement the Drunk Agent logic.
+ * It should take a map and parameters controlling the agent's behavior,
+ * then return the updated map after the agent performs its actions.
+ *
+ * @param currentMap The map in its current state.
+ * @param W Width of the map.
+ * @param H Height of the map.
+ * @param J The number of times the agent "walks" (initiates a path).
+ * @param I The number of steps the agent takes per "walk".
+ * @param roomSizeX Max width of rooms the agent can generate.
+ * @param roomSizeY Max height of rooms the agent can generate.
+ * @param probGenerateRoom Probability (0.0 to 1.0) of generating a room at each step.
+ * @param probIncreaseRoom If no room is generated, this value increases probGenerateRoom.
+ * @param probChangeDirection Probability (0.0 to 1.0) of changing direction at each step.
+ * @param probIncreaseChange If direction is not changed, this value increases probChangeDirection.
+ * @param agentX Current X position of the agent (updated by reference).
+ * @param agentY Current Y position of the agent (updated by reference).
+ * @return The map after the agent's movements and actions.
+ */
 Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int roomSizeY,
                double probGenerateRoom, double probIncreaseRoom,
                double probChangeDirection, double probIncreaseChange,
@@ -68,82 +126,6 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
             }
         }
     }
-
-    return newMap;
-}
-/**
- * @brief Prints the map (matrix) to the console.
- * @param map The map to print.
- */
-void printMap(const Map& map) {
-    std::cout << "--- Current Map ---" << std::endl;
-    for (const auto& row : map) {
-        for (int cell : row) {
-            // Adapt this to represent your cells meaningfully (e.g., ' ' for empty, '#' for occupied).
-            std::cout << cell << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "-------------------" << std::endl;
-}
-
-/**
- * @brief Function to implement the Cellular Automata logic.
- * It should take a map and return the updated map after one iteration.
- * @param currentMap The map in its current state.
- * @param W Width of the map.
- * @param H Height of the map.
- * @param R Radius of the neighbor window (e.g., 1 for 3x3, 2 for 5x5).
- * @param U Threshold to decide if the current cell becomes 1 or 0.
- * @return The map after applying the cellular automata rules.
- */
-Map cellularAutomata(const Map& currentMap, int W, int H, int R, double U) {
-    Map newMap = currentMap; // Initially, the new map is a copy of the current one
-
-    // TODO: IMPLEMENTATION GOES HERE for the cellular automata logic.
-    // Iterate over each cell and apply the transition rules.
-    // Remember that updates should be based on the 'currentMap' state
-    // and applied to the 'newMap' to avoid race conditions within the same iteration.
-
-    return newMap;
-}
-
-/**
- * @brief Function to implement the Drunk Agent logic.
- * It should take a map and parameters controlling the agent's behavior,
- * then return the updated map after the agent performs its actions.
- *
- * @param currentMap The map in its current state.
- * @param W Width of the map.
- * @param H Height of the map.
- * @param J The number of times the agent "walks" (initiates a path).
- * @param I The number of steps the agent takes per "walk".
- * @param roomSizeX Max width of rooms the agent can generate.
- * @param roomSizeY Max height of rooms the agent can generate.
- * @param probGenerateRoom Probability (0.0 to 1.0) of generating a room at each step.
- * @param probIncreaseRoom If no room is generated, this value increases probGenerateRoom.
- * @param probChangeDirection Probability (0.0 to 1.0) of changing direction at each step.
- * @param probIncreaseChange If direction is not changed, this value increases probChangeDirection.
- * @param agentX Current X position of the agent (updated by reference).
- * @param agentY Current Y position of the agent (updated by reference).
- * @return The map after the agent's movements and actions.
- */
-Map drunkAgent(const Map& currentMap, int W, int H, int J, int I, int roomSizeX, int roomSizeY,
-               double probGenerateRoom, double probIncreaseRoom,
-               double probChangeDirection, double probIncreaseChange,
-               int& agentX, int& agentY) {
-    Map newMap = currentMap; // The new map is a copy of the current one
-    
-
-    // TODO: IMPLEMENTATION GOES HERE for the Drunk Agent logic.
-    // The agent should move randomly.
-    // You'll need a random number generator.
-    // Consider:
-    // - How the agent moves (possible steps).
-    // - What it does if it encounters a border or an obstacle (if applicable).
-    // - How it modifies the map (e.g., leaving a trail, creating rooms, etc.).
-    // - Use the provided parameters (J, I, roomSizeX, roomSizeY, probabilities)
-    //   to control its behavior.
 
     return newMap;
 }
