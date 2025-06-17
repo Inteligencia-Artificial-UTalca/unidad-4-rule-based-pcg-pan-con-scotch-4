@@ -10,21 +10,43 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
                double probGenerateRoom, double probIncreaseRoom,
                double probChangeDirection, double probIncreaseChange,
                int& agentX, int& agentY) {
-    Map newMap = currentMap; // Copia del mapa actual
-    // Configurar el generador de números aleatorios
+    Map newMap = currentMap;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<> distDirection(0, 3); // 0: arriba, 1: abajo, 2: izquierda, 3: derecha
+    std::uniform_int_distribution<> distDirection(0, 3);
     std::uniform_real_distribution<> distProb(0.0, 1.0);
 
-    // Posibles movimientos: {dx, dy}
-    std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // arriba, abajo, izq, der
+    std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    double currentProbRoom = probGenerateRoom; // Probabilidad actual para generar habitación
 
-    for (int walk = 0; walk < J; ++walk) { // J caminatas
-        int currentDirection = distDirection(gen); // Dirección inicial aleatoria
-        for (int step = 0; step < I; ++step) { // I pasos por caminata
+    for (int walk = 0; walk < J; ++walk) {
+        int currentDirection = distDirection(gen);
+        for (int step = 0; step < I; ++step) {
             // Marcar la posición actual como pasillo (1)
             newMap[agentX][agentY] = 1;
+
+            // Decidir si generar una habitación
+            if (distProb(gen) < currentProbRoom) {
+                // Generar habitación centrada en (agentX, agentY)
+                int halfX = roomSizeX / 2;
+                int halfY = roomSizeY / 2;
+                // Ajustar límites para no salirse del mapa
+                int startX = std::max(0, agentX - halfX);
+                int endX = std::min(H - 1, agentX + halfX);
+                int startY = std::max(0, agentY - halfY);
+                int endY = std::min(W - 1, agentY + halfY);
+                // Marcar la habitación con 1
+                for (int x = startX; x <= endX; ++x) {
+                    for (int y = startY; y <= endY; ++y) {
+                        newMap[x][y] = 1;
+                    }
+                }
+                // Reiniciar probabilidad
+                currentProbRoom = probGenerateRoom;
+            } else {
+                // Aumentar probabilidad si no se genera habitación
+                currentProbRoom += probIncreaseRoom;
+            }
 
             // Calcular el siguiente movimiento
             int dx = directions[currentDirection].first;
@@ -32,13 +54,11 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
             int nextX = agentX + dx;
             int nextY = agentY + dy;
 
-            // Verificar si el siguiente movimiento está dentro de los límites
+            // Verificar límites
             if (nextX >= 0 && nextX < H && nextY >= 0 && nextY < W) {
-                // Mover al agente
                 agentX = nextX;
                 agentY = nextY;
             } else {
-                // Si se sale del mapa, cambiar de dirección aleatoriamente
                 currentDirection = distDirection(gen);
             }
         }
