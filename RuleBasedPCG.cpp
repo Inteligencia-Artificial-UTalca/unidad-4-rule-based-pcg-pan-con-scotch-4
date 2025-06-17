@@ -6,7 +6,46 @@
 // Define Map as a vector of vectors of integers.
 // You can change 'int' to whatever type best represents your cells (e.g., char, bool).
 using Map = std::vector<std::vector<int>>;
+Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int roomSizeY,
+               double probGenerateRoom, double probIncreaseRoom,
+               double probChangeDirection, double probIncreaseChange,
+               int& agentX, int& agentY) {
+    Map newMap = currentMap; // Copia del mapa actual
+    // Configurar el generador de números aleatorios
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> distDirection(0, 3); // 0: arriba, 1: abajo, 2: izquierda, 3: derecha
+    std::uniform_real_distribution<> distProb(0.0, 1.0);
 
+    // Posibles movimientos: {dx, dy}
+    std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // arriba, abajo, izq, der
+
+    for (int walk = 0; walk < J; ++walk) { // J caminatas
+        int currentDirection = distDirection(gen); // Dirección inicial aleatoria
+        for (int step = 0; step < I; ++step) { // I pasos por caminata
+            // Marcar la posición actual como pasillo (1)
+            newMap[agentX][agentY] = 1;
+
+            // Calcular el siguiente movimiento
+            int dx = directions[currentDirection].first;
+            int dy = directions[currentDirection].second;
+            int nextX = agentX + dx;
+            int nextY = agentY + dy;
+
+            // Verificar si el siguiente movimiento está dentro de los límites
+            if (nextX >= 0 && nextX < H && nextY >= 0 && nextY < W) {
+                // Mover al agente
+                agentX = nextX;
+                agentY = nextY;
+            } else {
+                // Si se sale del mapa, cambiar de dirección aleatoriamente
+                currentDirection = distDirection(gen);
+            }
+        }
+    }
+
+    return newMap;
+}
 /**
  * @brief Prints the map (matrix) to the console.
  * @param map The map to print.
@@ -69,6 +108,7 @@ Map drunkAgent(const Map& currentMap, int W, int H, int J, int I, int roomSizeX,
                double probChangeDirection, double probIncreaseChange,
                int& agentX, int& agentY) {
     Map newMap = currentMap; // The new map is a copy of the current one
+    
 
     // TODO: IMPLEMENTATION GOES HERE for the Drunk Agent logic.
     // The agent should move randomly.
