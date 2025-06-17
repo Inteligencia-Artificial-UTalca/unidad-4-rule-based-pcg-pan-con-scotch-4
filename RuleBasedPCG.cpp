@@ -148,75 +148,73 @@ Map drunkAgent(Map& currentMap, int W, int H, int J, int I, int roomSizeX, int r
 int main() {
     std::cout << "--- CELLULAR AUTOMATA AND DRUNK AGENT SIMULATION ---" << std::endl;
 
+    // Configurar generador de números aleatorios
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dist01(0, 1);
+    std::uniform_int_distribution<> distJ(3, 7); // Rango para J
+    std::uniform_int_distribution<> distI(5, 15); // Rango para I
+    std::uniform_int_distribution<> distRoomX(3, 7); // Rango para roomSizeX
+    std::uniform_int_distribution<> distRoomY(2, 5); // Rango para roomSizeY
+    std::uniform_real_distribution<> distProb(0.05, 0.3); // Rango para probabilidades
+    std::uniform_real_distribution<> distProbInc(0.01, 0.1); // Rango para incrementos
+
     // --- Initial Map Configuration ---
     int mapRows = 10;
     int mapCols = 20;
-    Map myMap(mapRows, std::vector<int>(mapCols, 0)); // Map initialized with zeros
+    Map myMap(mapRows, std::vector<int>(mapCols, 0));
 
-    // TODO: IMPLEMENTATION GOES HERE: Initialize the map with some pattern or initial state.
-    // For example, you might set some cells to 1 for the cellular automata
-    // or place the drunk agent at a specific position.
-    // Inicializar el mapa con valores aleatorios 0 o 1
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed);
-    std::uniform_int_distribution<> dist(0, 1);
+    // Inicializar mapa con valores aleatorios
     for (int i = 0; i < mapRows; ++i) {
         for (int j = 0; j < mapCols; ++j) {
-            myMap[i][j] = dist(gen);
+            myMap[i][j] = dist01(gen);
         }
     }
 
     // Drunk Agent's initial position
     int drunkAgentX = mapRows / 2;
     int drunkAgentY = mapCols / 2;
-    // If your agent modifies the map at start, you could do it here:
-    // myMap[drunkAgentX][drunkAgentY] = 2; // Assuming '2' represents the agent
 
     std::cout << "\nInitial map state:" << std::endl;
     printMap(myMap);
 
     // --- Simulation Parameters ---
-    int numIterations = 5; // Number of simulation steps
+    int numIterations = 5;
 
     // Cellular Automata Parameters
     int ca_W = mapCols;
     int ca_H = mapRows;
-    int ca_R = 1;      // Radius of neighbor window
-    double ca_U = 0.5; // Threshold
-
-    // Drunk Agent Parameters
-    int da_W = mapCols;
-    int da_H = mapRows;
-    int da_J = 5;      // Number of "walks"
-    int da_I = 10;     // Steps per walk
-    int da_roomSizeX = 5;
-    int da_roomSizeY = 3;
-    double da_probGenerateRoom = 0.1;
-    double da_probIncreaseRoom = 0.05;
-    double da_probChangeDirection = 0.2;
-    double da_probIncreaseChange = 0.03;
-
+    int ca_R = 1;
+    double ca_U = 0.5;
 
     // --- Main Simulation Loop ---
     for (int iteration = 0; iteration < numIterations; ++iteration) {
         std::cout << "\n--- Iteration " << iteration + 1 << " ---" << std::endl;
 
-        // TODO: IMPLEMENTATION GOES HERE: Call the Cellular Automata and/or Drunk Agent functions.
-        // The order of calls will depend on how you want them to interact.
+        // Generar parámetros aleatorios para Drunk Agent
+        int da_J = distJ(gen);
+        int da_I = distI(gen);
+        int da_roomSizeX = distRoomX(gen);
+        int da_roomSizeY = distRoomY(gen);
+        double da_probGenerateRoom = distProb(gen);
+        double da_probIncreaseRoom = distProbInc(gen);
+        double da_probChangeDirection = distProb(gen);
+        double da_probIncreaseChange = distProbInc(gen);
 
-        // Example: First the cellular automata, then the agent
+        std::cout << "Parámetros Drunk Agent: J=" << da_J << ", I=" << da_I
+                  << ", roomSizeX=" << da_roomSizeX << ", roomSizeY=" << da_roomSizeY
+                  << ", probRoom=" << da_probGenerateRoom << ", probIncRoom=" << da_probIncreaseRoom
+                  << ", probChange=" << da_probChangeDirection << ", probIncChange=" << da_probIncreaseChange
+                  << std::endl;
+
+        // Ejecutar simulaciones
         myMap = cellularAutomata(myMap, ca_W, ca_H, ca_R, ca_U);
-        myMap = drunkAgent(myMap, da_W, da_H, da_J, da_I, da_roomSizeX, da_roomSizeY,
+        myMap = drunkAgent(myMap, ca_W, ca_H, da_J, da_I, da_roomSizeX, da_roomSizeY,
                            da_probGenerateRoom, da_probIncreaseRoom,
                            da_probChangeDirection, da_probIncreaseChange,
                            drunkAgentX, drunkAgentY);
 
         printMap(myMap);
-
-        // You can add a delay to visualize the simulation step by step
-        // #include <thread> // For std::this_thread::sleep_for
-        // #include <chrono> // For std::chrono::milliseconds
-        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     std::cout << "\n--- Simulation Finished ---" << std::endl;
