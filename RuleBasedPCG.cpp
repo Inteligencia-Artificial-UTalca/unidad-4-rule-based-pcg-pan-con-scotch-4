@@ -33,15 +33,32 @@ void printMap(const Map& map) {
  * @param U Threshold to decide if the current cell becomes 1 or 0.
  * @return The map after applying the cellular automata rules.
  */
-Map cellularAutomata(const Map& currentMap, int W, int H, int R, double U) {
-    Map newMap = currentMap; // Initially, the new map is a copy of the current one
+Map cellularAutomata(Map& currentMap, int W, int H, int R, double U) {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<> distProb(0.0, 1.0);
 
-    // TODO: IMPLEMENTATION GOES HERE for the cellular automata logic.
-    // Iterate over each cell and apply the transition rules.
-    // Remember that updates should be based on the 'currentMap' state
-    // and applied to the 'newMap' to avoid race conditions within the same iteration.
+    for (int i = 0; i < H; ++i) {
+        for (int j = 0; j < W; ++j) {
+            // Contar vecinos con valor 1 en la ventana de radio R
+            int countOnes = 0;
+            for (int di = -R; di <= R; ++di) {
+                for (int dj = -R; dj <= R; ++dj) {
+                    int ni = i + di;
+                    int nj = j + dj;
+                    // Verificar si el vecino está dentro del mapa
+                    if (ni >= 0 && ni < H && nj >= 0 && nj < W) {
+                        countOnes += currentMap[ni][nj];
+                    }
+                }
+            }
+            // Aplicar regla: si el conteo supera el umbral U, la celda se convierte en 1
+            double neighborRatio = static_cast<double>(countOnes) / ((2 * R + 1) * (2 * R + 1));
+            currentMap[i][j] = (neighborRatio > U) ? 1 : 0;
+        }
+    }
 
-    return newMap;
+    return currentMap;
 }
 
 /**
@@ -141,6 +158,15 @@ int main() {
     // TODO: IMPLEMENTATION GOES HERE: Initialize the map with some pattern or initial state.
     // For example, you might set some cells to 1 for the cellular automata
     // or place the drunk agent at a specific position.
+    // Inicializar el mapa con valores aleatorios 0 o 1
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dist(0, 1);
+    for (int i = 0; i < mapRows; ++i) {
+        for (int j = 0; j < mapCols; ++j) {
+            myMap[i][j] = dist(gen);
+        }
+    }
 
     // Drunk Agent's initial position
     int drunkAgentX = mapRows / 2;
